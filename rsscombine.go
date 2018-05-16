@@ -12,6 +12,8 @@ import "github.com/spf13/viper"
 import "io/ioutil"
 import "mvdan.cc/xurls"
 import "strings"
+import "os"
+import "strconv"
 
 var feedCache = cache.New(3600*time.Second, 3600*time.Second)
 
@@ -170,7 +172,13 @@ func main() {
   }
   cache_timeout_seconds := time.Duration(viper.GetInt("cache_timeout_seconds")) * time.Second
   feedCache = cache.New(cache_timeout_seconds, cache_timeout_seconds)
-  port := viper.GetInt("port")
+  herokuPort := os.Getenv("PORT")
+  port := 0
+  if herokuPort == "" {
+    port = viper.GetInt("port")
+  } else {
+    port, _ = strconv.Atoi(herokuPort)
+  }
   http.HandleFunc("/", handler)
   log.Printf("Listening on: http://localhost:%v/\n", port)
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
