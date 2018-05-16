@@ -11,6 +11,7 @@ import "github.com/patrickmn/go-cache"
 import "github.com/spf13/viper"
 import "io/ioutil"
 import "mvdan.cc/xurls"
+import "strings"
 
 var feedCache = cache.New(3600*time.Second, 3600*time.Second)
 
@@ -29,7 +30,12 @@ func getUrlsFromFeedsUrl(feeds_url string) []string {
     if err != nil {
       log.Fatal(err)
     } else {
-      feed_urls := xurls.Strict().FindAllString(string(contents), -1)
+      stringContents := string(contents)
+      // TODO: this is a hack
+      for _, exclude := range viper.GetStringSlice("feed_exclude_prefixes") {
+        stringContents = strings.Replace(stringContents, exclude, "", -1)
+      }
+      feed_urls := xurls.Strict().FindAllString(stringContents, -1)
       feedCache.Set("feed_urls:" + feeds_url, feed_urls, cache.DefaultExpiration)
       return feed_urls
     }
