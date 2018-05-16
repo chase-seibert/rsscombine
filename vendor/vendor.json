@@ -187,6 +187,12 @@
 			"path": "golang.org/x/text/transform",
 			"revision": "5c1cf69b5978e5a34c5f9ba09a83e56acc4b7877",
 			"revisionTime": "2018-05-10T04:57:31Z"
+		},
+		{
+			"checksumSHA1": "+QgVquNF/RjNZjj4dWKgroQ/Koo=",
+			"path": "mvdan.cc/xurls",
+			"revision": "a984e12a0da3861db06b38a2ef575420e856e7a4",
+			"revisionTime": "2018-03-31T13:59:46Z"
 		}
 	],
 	"rootPath": "github.com/rsscombine"

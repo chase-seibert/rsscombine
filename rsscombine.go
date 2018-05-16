@@ -9,18 +9,47 @@ import "net/http"
 import "log"
 import "github.com/patrickmn/go-cache"
 import "github.com/spf13/viper"
+import "io/ioutil"
+import "mvdan.cc/xurls"
 
 var feedCache = cache.New(3600*time.Second, 3600*time.Second)
 
+func getUrlsFromFeedsUrl(feeds_url string) []string {
+  cachedFeed, found := feedCache.Get("feed_urls:" + feeds_url)
+  if found {
+    return cachedFeed.([]string)
+  }
+  log.Printf("Loading feed URLs from: %v", feeds_url)
+  response, err := http.Get(feeds_url)
+  if err != nil {
+    log.Fatal(err)
+  } else {
+    defer response.Body.Close()
+    contents, err := ioutil.ReadAll(response.Body)
+    if err != nil {
+      log.Fatal(err)
+    } else {
+      feed_urls := xurls.Strict().FindAllString(string(contents), -1)
+      feedCache.Set("feed_urls:" + feeds_url, feed_urls, cache.DefaultExpiration)
+      return feed_urls
+    }
+  }
+  return nil
+}
+
 func getUrls() []string {
+  feeds_url := viper.GetString("feed_urls")
+  if feeds_url != "" {
+    return getUrlsFromFeedsUrl(feeds_url)
+  }
   return viper.GetStringSlice("feeds")
 }
 
 func fetchUrl(url string, ch chan<-*gofeed.Feed) {
-  cachedFeed, found := feedCache.Get(url)
+  cachedFeed, found := feedCache.Get("feed:" + url)
   if found {
     log.Printf("Cached URL: %v\n", url)
-  ch <- cachedFeed.(*gofeed.Feed)
+    ch <- cachedFeed.(*gofeed.Feed)
     return
   }
   log.Printf("Fetching URL: %v\n", url)
@@ -28,7 +57,7 @@ func fetchUrl(url string, ch chan<-*gofeed.Feed) {
   feed, err := fp.ParseURL(url)
   if err == nil {
     ch <- feed
-    feedCache.Set(url, feed, cache.DefaultExpiration)
+    feedCache.Set("feed:" + url, feed, cache.DefaultExpiration)
   } else {
     log.Printf("Error on URL: %v (%v)", url, err)
     ch <- nil
@@ -78,7 +107,6 @@ func getAuthor(feed *gofeed.Feed) string {
   if feed.Items[0].Author != nil {
     return feed.Items[0].Author.Name
   }
-  // TODO: handle better
   log.Printf("Could not determine author for %v", feed.Link)
   return viper.GetString("default_author_name")
 }
