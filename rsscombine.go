@@ -100,10 +100,10 @@ func (s byPublished) Swap(i, j int) {
 
 func (s byPublished) Less(i, j int) bool {
     if s[i].Items[0].PublishedParsed == nil {
-      return false
+      return true
     }
     if s[j].Items[0].PublishedParsed == nil {
-      return true
+      return false
     }
     return s[i].Items[0].PublishedParsed.Before(*s[j].Items[0].PublishedParsed)
 }
