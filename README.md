@@ -16,9 +16,30 @@ open http://localhost:8080
 
 ## Configuration
 
-You can load the RSS URLs to combine via several methods.
+You can specify configuration options as either a YAML file, or as environment
+variables. Environment variable names should be in all caps, prefixed by
+`RSSCOMBINE_` with underscored included. The only exception is the `feeds`
+items. You cannot specify that list of URLs via environment variables. Instead,
+you can specify a `RSSCOMBINE_FEEDS_URL`. See "Feeds URL" bellow.
 
-## Local YAML File
+### Options
+
+See the "Example YAML File" section for example defaults. 
+
+| YAML Name             | Environment Variable             | Description                                                                           |
+|-----------------------|----------------------------------|---------------------------------------------------------------------------------------|
+| title                 | RSSCOMBINE_TITLE                 | Title of the new RSS feed.                                                            |
+| link                  | RSSCOMBINE_LINK                  | Link to the new RSS feed. Can be a webpage or the feed URL.                           |
+| description           | RSSCOMBINE_DESCRIPTION           | Description of your new feed, shows in RSS readers.                                   |
+| author_name           | RSSCOMBINE_AUTHOR_NAME           | Your full name, shows in RSS readers.                                                 |
+| author_email          | RSSCOMBINE_AUTHOR_EMAIL          | Your email, shows in RSS readers.                                                     |
+| port                  | PORT, RSSCOMBINE_AUTHOR_PORT     | Port to run the service on. For Heroku support, PORT environment variable supersedes. |
+| cache_timeout_seconds | RSSCOMBINE_CACHE_TIMEOUT_SECONDS | Seconds to cache individual feeds in memory, as well as a feeds_url file.             |
+| feeds                 |                                  | List of feeds to combine. Cannot be specified via environment variable.               |
+| feed_urls             | RSSCOMBINE_FEED_URLS             | Optional: URL to parse feed URLs from. If set, this overrides the feeds setting.      |
+| feed_exclude_prefixes | RSSCOMBINE_FEED_EXCLUDE_PREFIXES | Optional: list of URL prefixes to exclude from feed_urls parsing.                     |
+
+## Example YAML File
 
 You can create a local `rsscombine.yml` file in this format:
 
@@ -36,17 +57,6 @@ feeds:
   - http://www.reddit.com/r/technology/.rss
   - http://rss.slashdot.org/slashdot/slashdotMainatom
 ```
-
-## Environment Variables
-
-The above configuration value can also be specified as environment variables.
-Each environment variable name should be in all caps, prefixed by `RSSCOMBINE_`
-with underscored included.
-For example, `title` can be loaded from `RSSCOMBINE_TITLE`, and
-`cache_timeout_seconds` can be loaded from `RSSCOMBINE_CACHE_TIMEOUT_SECONDS`.
-
-The only exception is the `feeds` items. For those values, you can specify
-a `RSSCOMBINE_FEEDS_URL`. See bellow.
 
 ### Feeds URL
 
