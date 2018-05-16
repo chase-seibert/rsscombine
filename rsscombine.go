@@ -99,13 +99,15 @@ func (s byPublished) Swap(i, j int) {
 }
 
 func (s byPublished) Less(i, j int) bool {
-    if s[i].Items[0].PublishedParsed == nil {
-      return true
+    date1 := s[i].Items[0].PublishedParsed
+    if date1 == nil {
+      date1 = s[i].Items[0].UpdatedParsed
     }
-    if s[j].Items[0].PublishedParsed == nil {
-      return false
+    date2 := s[j].Items[0].PublishedParsed
+    if date2 == nil {
+      date2 = s[j].Items[0].UpdatedParsed
     }
-    return s[i].Items[0].PublishedParsed.Before(*s[j].Items[0].PublishedParsed)
+    return date1.Before(*date2)
 }
 
 func getAuthor(feed *gofeed.Feed) string {
@@ -130,7 +132,7 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
       },
       Created: time.Now(),
   }
-  sort.Sort(byPublished(allFeeds))
+  sort.Sort(sort.Reverse(byPublished(allFeeds)))
   for _, sourceFeed := range allFeeds {
     // TODO: interleave ALL items and then sort?
     item := sourceFeed.Items[0]
