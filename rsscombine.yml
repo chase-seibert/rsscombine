@@ -8,6 +8,8 @@ cache_timeout_seconds: 3600
 feed_urls: https://raw.githubusercontent.com/chase-seibert/engineering-manager-blogs/master/README.md
 feed_exclude_prefixes:
   - https://raw.githubusercontent.com/
+  - https://github.com/chase-seibert/rsscombine
+  - https://engineering-manager-blogs.herokuapp.com/
 feeds:
   - http://feeds.feedburner.com/TechCrunch
   - http://feeds.arstechnica.com/arstechnica/technology-lab
