@@ -79,7 +79,7 @@ func getAuthor(feed *gofeed.Feed) string {
     return feed.Items[0].Author.Name
   }
   // TODO: handle better
-  fmt.Printf("Could not determine author for %v", feed.Link)
+  log.Printf("Could not determine author for %v", feed.Link)
   return viper.GetString("default_author_name")
 }
 
