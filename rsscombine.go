@@ -8,25 +8,12 @@ import "time"
 import "net/http"
 import "log"
 import "github.com/patrickmn/go-cache"
-import "os"
+import "github.com/spf13/viper"
 
-const README_URL = "https://raw.githubusercontent.com/chase-seibert/engineering-manager-blogs/master/README.md"
-var feedCache = cache.New(60*time.Minute, 10*time.Minute) // timeout, purge time
+var feedCache = cache.New(3600*time.Second, 3600*time.Second)
 
-func getUrls(baseUrl string) []string {
-  return []string{
-  "https://ibenstewart.com/feed",
-  "https://danielrichnak.com/feed",
-  "https://chase-seibert.github.io/blog/feed.xml",
-  "https://chelseatroy.com/feed/",
-  "https://medium.com/feed/dakshp",
-  "https://www.leadsv.com/insight/?format=rss",
-  "http://www.kendallmiller.co/kendall-miller-blog?format=RSS",
-  "https://matthewnewkirk.com/feed/",
-  "http://randsinrepose.com/feed/",
-  "https://medium.com/feed/@royrapoport",
-  "https://introvertedengineer.com/feed",
-  }
+func getUrls() []string {
+  return viper.GetStringSlice("feeds")
 }
 
 func fetchUrl(url string, ch chan<-*gofeed.Feed) {
@@ -75,7 +62,12 @@ func (s byPublished) Swap(i, j int) {
 }
 
 func (s byPublished) Less(i, j int) bool {
-    // TODO: handle nulls
+    if s[i].Items[0].PublishedParsed == nil {
+      return false
+    }
+    if s[j].Items[0].PublishedParsed == nil {
+      return true
+    }
     return s[i].Items[0].PublishedParsed.Before(*s[j].Items[0].PublishedParsed)
 }
 
@@ -88,38 +80,42 @@ func getAuthor(feed *gofeed.Feed) string {
   }
   // TODO: handle better
   fmt.Printf("Could not determine author for %v", feed.Link)
-  return "Unknown Author"
+  return viper.GetString("default_author_name")
 }
 
 func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
   feed := &feeds.Feed{
-      // TODO: where to pull this metadata from?
-      Title:       "Engineering Manager Blogs",
-      //Link:        &feeds.Link{Href: "https://github.com/chase-seibert/engineering-manager-blogs"},
-      Description: "Collection of Engineering Manager Blog RSS Feeds",
-      Author:      &feeds.Author{Name: "Chase Seibert", Email: "chase.seibert@gmail.com"},
-      Created:     time.Now(),
+      Title: viper.GetString("title"),
+      Link: &feeds.Link{Href: viper.GetString("link")},
+      Description: viper.GetString("description"),
+      Author: &feeds.Author{
+        Name: viper.GetString("author_name"),
+        Email: viper.GetString("author_email"),
+      },
+      Created: time.Now(),
   }
   sort.Sort(byPublished(allFeeds))
   for _, sourceFeed := range allFeeds {
     // TODO: interleave ALL items and then sort?
     item := sourceFeed.Items[0]
+    created := item.PublishedParsed
+    if created == nil {
+      created = item.UpdatedParsed
+    }
     feed.Items = append(feed.Items, &feeds.Item{
-      Title:       item.Title,
-      Link:        &feeds.Link{Href: item.Link},
+      Title: item.Title,
+      Link: &feeds.Link{Href: item.Link},
       Description: item.Description,
-      //Author:      &feeds.Author{Name: item.Author.Name, Email: item.Author.Email},
-      Author:      &feeds.Author{Name: getAuthor(sourceFeed)},
-      Created:     *item.PublishedParsed,
-      //Updated:     *item.UpdatedParsed,
-      Content:     item.Content,
+      Author: &feeds.Author{Name: getAuthor(sourceFeed)},
+      Created: *created,
+      Content: item.Content,
     })
   }
   return feed
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-  urls := getUrls(README_URL)
+  urls := getUrls()
   allFeeds := fetchUrls(urls)
   combinedFeed := combineallFeeds(allFeeds)
   atom, _ := combinedFeed.ToAtom()
@@ -128,11 +124,20 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-  port := os.Getenv("PORT")
-  if port == "" {
-    port = "8080"
+  viper.SetConfigName("rsscombine")
+  viper.AddConfigPath(".")
+  viper.SetEnvPrefix("RSSCOMBINE")
+  viper.AutomaticEnv()
+  viper.SetDefault("port", "8080")
+  viper.SetDefault("default_author_name", "Unknown Author")
+  err := viper.ReadInConfig()
+  if err != nil {
+    panic(fmt.Errorf("Fatal error config file: %s \n", err))
   }
+  cache_timeout_seconds := time.Duration(viper.GetInt("cache_timeout_seconds")) * time.Second
+  feedCache = cache.New(cache_timeout_seconds, cache_timeout_seconds)
+  port := viper.GetInt("port")
   http.HandleFunc("/", handler)
   log.Printf("Listening on: http://localhost:%v/\n", port)
-  log.Fatal(http.ListenAndServe(":" + port, nil))
+  log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }

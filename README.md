@@ -1,6 +1,6 @@
 # RSS Combine
 
-Load RSS URLs from a hosted plain text file and combine them into one RSS feed.
+Combine multiple RSS feeds into a single feed, as a service.
 
 ## Quick Start
 
@@ -24,6 +24,7 @@ You can create a local `rsscombine.yml` file in this format:
 
 ```yaml
 title: My Technical RSS Feed
+link: http://wherethisfeedishosted.com/feed
 description: This is a personal collection of technical RSS feeds.
 author_name: John Doe
 author_email: john@example.com
@@ -33,6 +34,7 @@ feeds:
   - http://feeds.feedburner.com/TechCrunch
   - http://feeds.arstechnica.com/arstechnica/technology-lab
   - http://www.reddit.com/r/technology/.rss
+  - http://rss.slashdot.org/slashdot/slashdotMainatom
 ```
 
 ## Environment Variables
@@ -67,7 +69,7 @@ This is a README with some URLs.
 If that file is hosted at
 `https://raw.githubusercontent.com/chase-seibert/rsscombine/master/examples/basic.md`, then you can
 have RSS Combine load the file by defining the YAML key `feeds_url` or the
-environment variable `RSSCOMBINE_FEEDS_URL` with that URL as the value. 
+environment variable `RSSCOMBINE_FEEDS_URL` with that URL as the value.
 
 ## Production
 

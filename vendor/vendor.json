@@ -63,6 +63,12 @@
 			"revisionTime": "2017-07-22T04:01:10Z"
 		},
 		{
+			"checksumSHA1": "Kd8R7CLqI5pceYpTircWmxZzbvE=",
+			"path": "github.com/spf13/viper",
+			"revision": "15738813a09db5c8e5b60a19d67d3f9bd38da3a4",
+			"revisionTime": "2018-05-06T01:38:06Z"
+		},
+		{
 			"checksumSHA1": "6WbIuKGVDXQWwDjjEYx4fzLfQO8=",
 			"path": "golang.org/x/net/html",
 			"revision": "2491c5de3490fced2f6cff376127c667efeed857",

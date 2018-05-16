@@ -1,0 +1,12 @@
+title: My Technical RSS Feed
+link: http://wherethisfeedishosted.com/feed
+description: This is a personal collection of technical RSS feeds.
+author_name: John Doe
+author_email: john@example.com
+port: 8080
+cache_timeout_seconds: 3600
+feeds:
+  - http://feeds.feedburner.com/TechCrunch
+  - http://feeds.arstechnica.com/arstechnica/technology-lab
+  - http://www.reddit.com/r/technology/.rss
+  - http://rss.slashdot.org/slashdot/slashdotMainatom
