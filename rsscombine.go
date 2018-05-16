@@ -14,28 +14,28 @@ const README_URL = "https://raw.githubusercontent.com/chase-seibert/engineering-
 var feedCache = cache.New(60*time.Minute, 10*time.Minute) // timeout, purge time
 
 func getUrls(baseUrl string) []string {
-	return []string{
-		"https://ibenstewart.com/feed",
-		"https://danielrichnak.com/feed",
-		"https://chase-seibert.github.io/blog/feed.xml",
-		"https://chelseatroy.com/feed/",
-		"https://medium.com/feed/dakshp",
-		"https://www.leadsv.com/insight/?format=rss",
-		"http://www.kendallmiller.co/kendall-miller-blog?format=RSS",
-		"https://matthewnewkirk.com/feed/",
-		"http://randsinrepose.com/feed/",
-		"https://medium.com/feed/@royrapoport",
-		"https://introvertedengineer.com/feed",
-	}
+  return []string{
+  "https://ibenstewart.com/feed",
+  "https://danielrichnak.com/feed",
+  "https://chase-seibert.github.io/blog/feed.xml",
+  "https://chelseatroy.com/feed/",
+  "https://medium.com/feed/dakshp",
+  "https://www.leadsv.com/insight/?format=rss",
+  "http://www.kendallmiller.co/kendall-miller-blog?format=RSS",
+  "https://matthewnewkirk.com/feed/",
+  "http://randsinrepose.com/feed/",
+  "https://medium.com/feed/@royrapoport",
+  "https://introvertedengineer.com/feed",
+  }
 }
 
 func fetchUrl(url string, ch chan<-*gofeed.Feed) {
   cachedFeed, found := feedCache.Get(url)
-	if found {
+  if found {
     log.Printf("Cached URL: %v\n", url)
-		ch <- cachedFeed.(*gofeed.Feed)
+  ch <- cachedFeed.(*gofeed.Feed)
     return
-	}
+  }
   log.Printf("Fetching URL: %v\n", url)
   fp := gofeed.NewParser()
   feed, err := fp.ParseURL(url)
@@ -95,7 +95,7 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
   feed := &feeds.Feed{
       // TODO: where to pull this metadata from?
       Title:       "Engineering Manager Blogs",
-      Link:        &feeds.Link{Href: "https://github.com/chase-seibert/engineering-manager-blogs"},
+      //Link:        &feeds.Link{Href: "https://github.com/chase-seibert/engineering-manager-blogs"},
       Description: "Collection of Engineering Manager Blog RSS Feeds",
       Author:      &feeds.Author{Name: "Chase Seibert", Email: "chase.seibert@gmail.com"},
       Created:     time.Now(),
@@ -136,13 +136,3 @@ func main() {
   log.Printf("Listening on: http://localhost:%v/\n", port)
   log.Fatal(http.ListenAndServe(":" + port, nil))
 }
-
-/*
-- Hard code URLs, fetch in serial, print to screen
-- Parse RSS and produce new stream
-- Parallelize fetching, error handling
-- Get working as RSS server
-- Caching
-- Fetch list of URLs dynamically
-- lint/format
-*/
