@@ -1,1 +1,1 @@
-web: go run rsscombine.go
+web: rsscombine
