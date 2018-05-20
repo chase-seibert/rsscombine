@@ -174,6 +174,8 @@ func main() {
   viper.AutomaticEnv()
   viper.SetDefault("port", "8080")
   viper.SetDefault("default_author_name", "Unknown Author")
+  viper.SetDefault("server_timeout_seconds", "60")
+  viper.SetDefault("client_timeout_seconds", "60")
   err := viper.ReadInConfig()
   if err != nil {
     panic(fmt.Errorf("Fatal error config file: %s \n", err))
