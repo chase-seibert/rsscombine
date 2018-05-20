@@ -23,7 +23,10 @@ func getUrlsFromFeedsUrl(feeds_url string) []string {
     return cachedFeed.([]string)
   }
   log.Printf("Loading feed URLs from: %v", feeds_url)
-  response, err := http.Get(feeds_url)
+  client := &http.Client{
+    Timeout: time.Duration(viper.GetInt("client_timeout_seconds")) * time.Second,
+  }
+  response, err := client.Get(feeds_url)
   if err != nil {
     log.Fatal(err)
   } else {
@@ -62,6 +65,9 @@ func fetchUrl(url string, ch chan<-*gofeed.Feed) {
   }
   log.Printf("Fetching URL: %v\n", url)
   fp := gofeed.NewParser()
+  fp.Client = &http.Client{
+    Timeout: time.Duration(viper.GetInt("client_timeout_seconds")) * time.Second,
+  }
   feed, err := fp.ParseURL(url)
   if err == nil {
     ch <- feed
