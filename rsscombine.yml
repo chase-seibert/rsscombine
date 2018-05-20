@@ -4,6 +4,7 @@ description: This is a personal collection of technical RSS feeds.
 author_name: John Doe
 author_email: john@example.com
 port: 8080
+server_timeout_seconds: 60
 cache_timeout_seconds: 3600
 feed_urls: https://raw.githubusercontent.com/chase-seibert/engineering-manager-blogs/master/README.md
 feed_exclude_prefixes:

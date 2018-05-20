@@ -182,6 +182,12 @@ func main() {
     port, _ = strconv.Atoi(herokuPort)
   }
   http.HandleFunc("/", handler)
+  serverTimeoutSeconds := time.Duration(viper.GetInt("server_timeout_seconds"))
+  srv := &http.Server{
+    Addr: fmt.Sprintf(":%v", port),
+    ReadTimeout: serverTimeoutSeconds * time.Second,
+    WriteTimeout: serverTimeoutSeconds * time.Second,
+  }
   log.Printf("Listening on: http://localhost:%v/\n", port)
-  log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
+  log.Fatal(srv.ListenAndServe())
 }
