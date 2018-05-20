@@ -24,7 +24,7 @@ you can specify a `RSSCOMBINE_FEEDS_URL`. See "Feeds URL" bellow.
 
 ### Options
 
-See the "Example YAML File" section for example defaults. 
+See the "Example YAML File" section for example defaults.
 
 | YAML Name             | Environment Variable             | Description                                                                           |
 |-----------------------|----------------------------------|---------------------------------------------------------------------------------------|
@@ -35,6 +35,8 @@ See the "Example YAML File" section for example defaults.
 | author_email          | RSSCOMBINE_AUTHOR_EMAIL          | Your email, shows in RSS readers.                                                     |
 | port                  | PORT, RSSCOMBINE_AUTHOR_PORT     | Port to run the service on. For Heroku support, PORT environment variable supersedes. |
 | cache_timeout_seconds | RSSCOMBINE_CACHE_TIMEOUT_SECONDS | Seconds to cache individual feeds in memory, as well as a feeds_url file.             |
+| server_timeout_seconds | RSSCOMBINE_SERVER_TIMEOUT_SECONDS | Seconds to timeout calls to the combined RSS feed sever.             |
+| client_timeout_seconds | RSSCOMBINE_CLIENT_TIMEOUT_SECONDS | Seconds to timeout call from the server to the individual RSS feeds.             |
 | feeds                 |                                  | List of feeds to combine. Cannot be specified via environment variable.               |
 | feed_urls             | RSSCOMBINE_FEED_URLS             | Optional: URL to parse feed URLs from. If set, this overrides the feeds setting.      |
 | feed_exclude_prefixes | RSSCOMBINE_FEED_EXCLUDE_PREFIXES | Optional: list of URL prefixes to exclude from feed_urls parsing.                     |
