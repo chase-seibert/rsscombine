@@ -25,6 +25,8 @@ func main() {
     Bucket: aws.String(bucket),
     Key: aws.String(filename),
     Body: strings.NewReader(atom),
+    ContentType: aws.String("text/xml"),
+    ACL: aws.String("public-read"),
   })
   if err != nil {
       log.Fatal("Unable to upload %q to %q, %v", filename, bucket, err)
