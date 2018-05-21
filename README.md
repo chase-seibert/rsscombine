@@ -10,7 +10,7 @@ Here is how you run the service locally.
 git clone git@github.com:chase-seibert/rsscombine.git
 cd rsscombine
 govendor sync
-go run rsscombine.go
+go run cmd/rsscombine-server/main.go
 open http://localhost:8080
 ```
 
