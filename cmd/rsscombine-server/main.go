@@ -27,6 +27,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
   log.Printf("Rendered RSS with %v items", len(combinedFeed.Items))
 }
 
+func nullHandler(w http.ResponseWriter, r *http.Request) {
+}
+
 func main() {
   rsscombine.LoadConfig()
   cache_timeout_seconds := time.Duration(viper.GetInt("cache_timeout_seconds")) * time.Second
@@ -38,6 +41,7 @@ func main() {
   } else {
     port, _ = strconv.Atoi(herokuPort)
   }
+  http.HandleFunc("/favicon.ico", nullHandler)
   http.HandleFunc("/", handler)
   serverTimeoutSeconds := time.Duration(viper.GetInt("server_timeout_seconds"))
   srv := &http.Server{
