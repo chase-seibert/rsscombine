@@ -1,4 +1,4 @@
-package main
+package rsscombine
 
 import "fmt"
 import "github.com/mmcdole/gofeed"
@@ -7,21 +7,12 @@ import "sort"
 import "time"
 import "net/http"
 import "log"
-import "github.com/patrickmn/go-cache"
 import "github.com/spf13/viper"
 import "io/ioutil"
 import "mvdan.cc/xurls"
 import "strings"
-import "os"
-import "strconv"
-
-var feedCache = cache.New(3600*time.Second, 3600*time.Second)
 
 func getUrlsFromFeedsUrl(feeds_url string) []string {
-  cachedFeed, found := feedCache.Get("feed_urls:" + feeds_url)
-  if found {
-    return cachedFeed.([]string)
-  }
   log.Printf("Loading feed URLs from: %v", feeds_url)
   client := &http.Client{
     Timeout: time.Duration(viper.GetInt("client_timeout_seconds")) * time.Second,
@@ -41,7 +32,6 @@ func getUrlsFromFeedsUrl(feeds_url string) []string {
         stringContents = strings.Replace(stringContents, exclude, "", -1)
       }
       feed_urls := xurls.Strict().FindAllString(stringContents, -1)
-      feedCache.Set("feed_urls:" + feeds_url, feed_urls, cache.DefaultExpiration)
       return feed_urls
     }
   }
@@ -57,12 +47,6 @@ func getUrls() []string {
 }
 
 func fetchUrl(url string, ch chan<-*gofeed.Feed) {
-  cachedFeed, found := feedCache.Get("feed:" + url)
-  if found {
-    log.Printf("Cached URL: %v\n", url)
-    ch <- cachedFeed.(*gofeed.Feed)
-    return
-  }
   log.Printf("Fetching URL: %v\n", url)
   fp := gofeed.NewParser()
   fp.Client = &http.Client{
@@ -71,7 +55,6 @@ func fetchUrl(url string, ch chan<-*gofeed.Feed) {
   feed, err := fp.ParseURL(url)
   if err == nil {
     ch <- feed
-    feedCache.Set("feed:" + url, feed, cache.DefaultExpiration)
   } else {
     log.Printf("Error on URL: %v (%v)", url, err)
     ch <- nil
@@ -158,16 +141,14 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
   return feed
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func GetAtomFeed() *feeds.Feed {
   urls := getUrls()
   allFeeds := fetchUrls(urls)
   combinedFeed := combineallFeeds(allFeeds)
-  atom, _ := combinedFeed.ToAtom()
-  fmt.Fprintf(w, atom)
-  log.Printf("Rendered RSS with %v items", len(combinedFeed.Items))
+  return combinedFeed
 }
 
-func main() {
+func LoadConfig() {
   viper.SetConfigName("rsscombine")
   viper.AddConfigPath(".")
   viper.SetEnvPrefix("RSSCOMBINE")
@@ -180,22 +161,4 @@ func main() {
   if err != nil {
     panic(fmt.Errorf("Fatal error config file: %s \n", err))
   }
-  cache_timeout_seconds := time.Duration(viper.GetInt("cache_timeout_seconds")) * time.Second
-  feedCache = cache.New(cache_timeout_seconds, cache_timeout_seconds)
-  herokuPort := os.Getenv("PORT")
-  port := 0
-  if herokuPort == "" {
-    port = viper.GetInt("port")
-  } else {
-    port, _ = strconv.Atoi(herokuPort)
-  }
-  http.HandleFunc("/", handler)
-  serverTimeoutSeconds := time.Duration(viper.GetInt("server_timeout_seconds"))
-  srv := &http.Server{
-    Addr: fmt.Sprintf(":%v", port),
-    ReadTimeout: serverTimeoutSeconds * time.Second,
-    WriteTimeout: serverTimeoutSeconds * time.Second,
-  }
-  log.Printf("Listening on: http://localhost:%v/\n", port)
-  log.Fatal(srv.ListenAndServe())
 }
