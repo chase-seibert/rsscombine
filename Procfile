@@ -1,1 +1,1 @@
-web: rsscombine
+web: rsscombine-server
