@@ -40,6 +40,8 @@ See the "Example YAML File" section for example defaults.
 | feeds                 |                                  | List of feeds to combine. Cannot be specified via environment variable.               |
 | feed_urls             | RSSCOMBINE_FEED_URLS             | Optional: URL to parse feed URLs from. If set, this overrides the feeds setting.      |
 | feed_exclude_prefixes | RSSCOMBINE_FEED_EXCLUDE_PREFIXES | Optional: list of URL prefixes to exclude from feed_urls parsing.                     |
+| s3_bucket             | RSSCOMBINE_S3_BUCKET             | Optional: bucket name to use when uploading to S3. |
+| s3_filename           | RSSCOMBINE_S3_FILENAME           | Optional: file name to use when uploading to S3. |
 
 ## Example YAML File
 
@@ -85,10 +87,29 @@ environment variable `RSSCOMBINE_FEEDS_URL` with that URL as the value.
 
 ## Production
 
-The project contains an example `Procfile` for Heroku.
+### Web Server
+
+You can run a live RSS server. The project contains an example `Procfile`
+for Heroku.
 
 ```bash
 heroku create
 git push heroku master
 heroku open
 ```
+
+### Generate Static RSS File in S3
+
+You can also generate a static RSS file and upload to S3. Combined with the
+[Heroku Scheduler](https://elements.heroku.com/addons/scheduler), this option
+will minimize your dyno hours and serve the RSS much faster.
+
+For S3 uploads, you need to set the following as environment variables.
+
+| Environment Variable             | Description                                                                           |
+|----------------------------------|---------------------------------------------------------------------------------------|
+| AWS_REGION                       | The AWS Region your bucket is in. |
+| AWS_ACCESS_KEY_ID                | The AWS access key ID for your bucket. |
+| AWS_SECRET_ACCESS_KEY            | The AWS secret access key for your bucket. |
+
+See the Configuration section for setting `s3_bucket` and `s3_filename`.
