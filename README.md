@@ -104,6 +104,12 @@ You can also generate a static RSS file and upload to S3. Combined with the
 [Heroku Scheduler](https://elements.heroku.com/addons/scheduler), this option
 will minimize your dyno hours and serve the RSS much faster.
 
+Just run:
+
+```bash
+go run cmd/rsscombine-task/main.go
+```
+
 For S3 uploads, you need to set the following as environment variables.
 
 | Environment Variable             | Description                                                                           |
