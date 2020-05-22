@@ -123,8 +123,12 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
   }
   sort.Sort(sort.Reverse(byPublished(allFeeds)))
   limit_per_feed := viper.GetInt("feed_limit_per_feed")
+  seen := make(map[string]bool)
   for _, sourceFeed := range allFeeds {
     for _, item := range sourceFeed.Items[:limit_per_feed] {
+      if seen[item.Link] {
+        continue
+      }
       created := item.PublishedParsed
       if created == nil {
         created = item.UpdatedParsed
@@ -137,6 +141,7 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
         Created: *created,
         Content: item.Content,
       })
+      seen[item.Link] = true
     }
   }
   return feed
