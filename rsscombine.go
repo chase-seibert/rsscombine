@@ -122,21 +122,22 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
       Created: time.Now(),
   }
   sort.Sort(sort.Reverse(byPublished(allFeeds)))
+  limit_per_feed := viper.GetInt("feed_limit_per_feed")
   for _, sourceFeed := range allFeeds {
-    // TODO: interleave ALL items and then sort?
-    item := sourceFeed.Items[0]
-    created := item.PublishedParsed
-    if created == nil {
-      created = item.UpdatedParsed
+    for _, item := range sourceFeed.Items[:limit_per_feed] {
+      created := item.PublishedParsed
+      if created == nil {
+        created = item.UpdatedParsed
+      }
+      feed.Items = append(feed.Items, &feeds.Item{
+        Title: item.Title,
+        Link: &feeds.Link{Href: item.Link},
+        Description: item.Description,
+        Author: &feeds.Author{Name: getAuthor(sourceFeed)},
+        Created: *created,
+        Content: item.Content,
+      })
     }
-    feed.Items = append(feed.Items, &feeds.Item{
-      Title: item.Title,
-      Link: &feeds.Link{Href: item.Link},
-      Description: item.Description,
-      Author: &feeds.Author{Name: getAuthor(sourceFeed)},
-      Created: *created,
-      Content: item.Content,
-    })
   }
   return feed
 }
@@ -157,6 +158,7 @@ func LoadConfig() {
   viper.SetDefault("default_author_name", "Unknown Author")
   viper.SetDefault("server_timeout_seconds", "60")
   viper.SetDefault("client_timeout_seconds", "60")
+  viper.SetDefault("feed_limit_per_feed", "20")
   err := viper.ReadInConfig()
   if err != nil {
     panic(fmt.Errorf("Fatal error config file: %s \n", err))

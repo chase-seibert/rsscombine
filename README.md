@@ -5,6 +5,8 @@ Combine multiple RSS feeds into a single feed, as a service.
 ## Quick Start
 
 Here is how you run the service locally.
+Make sure to clone the code into `~/go/src/github.com`
+You may need to `brew install golang` and `go get -u github.com/kardianos/govendor`, first.
 
 ```bash
 git clone git@github.com:chase-seibert/rsscombine.git
@@ -40,6 +42,7 @@ See the "Example YAML File" section for example defaults.
 | feeds                 |                                  | List of feeds to combine. Cannot be specified via environment variable.               |
 | feed_urls             | RSSCOMBINE_FEED_URLS             | Optional: URL to parse feed URLs from. If set, this overrides the feeds setting.      |
 | feed_exclude_prefixes | RSSCOMBINE_FEED_EXCLUDE_PREFIXES | Optional: list of URL prefixes to exclude from feed_urls parsing.                     |
+| feed_limit_per_feed   | RSSCOMBINE_FEED_LIMIT_PER_FEED   | Optional: how many items you want to pull from each sub-feed. |
 | s3_bucket             | RSSCOMBINE_S3_BUCKET             | Optional: bucket name to use when uploading to S3. |
 | s3_filename           | RSSCOMBINE_S3_FILENAME           | Optional: file name to use when uploading to S3. |
 
