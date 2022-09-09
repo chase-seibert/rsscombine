@@ -5,15 +5,13 @@ Combine multiple RSS feeds into a single feed, as a service.
 ## Quick Start
 
 Here is how you run the service locally.
-Make sure to clone the code into `~/go/src/github.com`
-You may need to `brew install golang` and `go get -u github.com/kardianos/govendor`, first.
+You may need to `brew install golang`, first.
 
 ```bash
 git clone git@github.com:chase-seibert/rsscombine.git
 cd rsscombine
-govendor sync
-go run cmd/rsscombine-server/main.go
-open http://localhost:8080
+go mod download
+go run rsscombine.go
 ```
 
 ## Configuration
@@ -35,9 +33,6 @@ See the "Example YAML File" section for example defaults.
 | description           | RSSCOMBINE_DESCRIPTION           | Description of your new feed, shows in RSS readers.                                   |
 | author_name           | RSSCOMBINE_AUTHOR_NAME           | Your full name, shows in RSS readers.                                                 |
 | author_email          | RSSCOMBINE_AUTHOR_EMAIL          | Your email, shows in RSS readers.                                                     |
-| port                  | PORT, RSSCOMBINE_AUTHOR_PORT     | Port to run the service on. For Heroku support, PORT environment variable supersedes. |
-| cache_timeout_seconds | RSSCOMBINE_CACHE_TIMEOUT_SECONDS | Seconds to cache individual feeds in memory, as well as a feeds_url file.             |
-| server_timeout_seconds | RSSCOMBINE_SERVER_TIMEOUT_SECONDS | Seconds to timeout calls to the combined RSS feed sever.             |
 | client_timeout_seconds | RSSCOMBINE_CLIENT_TIMEOUT_SECONDS | Seconds to timeout call from the server to the individual RSS feeds.             |
 | feeds                 |                                  | List of feeds to combine. Cannot be specified via environment variable.               |
 | feed_urls             | RSSCOMBINE_FEED_URLS             | Optional: URL to parse feed URLs from. If set, this overrides the feeds setting.      |
@@ -88,29 +83,14 @@ If that file is hosted at
 have RSS Combine load the file by defining the YAML key `feeds_url` or the
 environment variable `RSSCOMBINE_FEEDS_URL` with that URL as the value.
 
-## Production
+## Generate Static RSS File in S3
 
-### Web Server
-
-You can run a live RSS server. The project contains an example `Procfile`
-for Heroku.
-
-```bash
-heroku create
-git push heroku master
-heroku open
-```
-
-### Generate Static RSS File in S3
-
-You can also generate a static RSS file and upload to S3. Combined with the
-[Heroku Scheduler](https://elements.heroku.com/addons/scheduler), this option
-will minimize your dyno hours and serve the RSS much faster.
+You can also generate a static RSS file and upload to S3. 
 
 Just run:
 
 ```bash
-go run cmd/rsscombine-task/main.go
+go run rsscombine.go
 ```
 
 For S3 uploads, you need to set the following as environment variables.
