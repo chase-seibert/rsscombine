@@ -1,8 +1,8 @@
-name: Go
+name: new-york-times-rss-top-100
 
 on:
   schedule:
-    - cron: '22 * * * *' # once an hour at minute 22
+    - cron: '22 */4 * * *'
 
 jobs:
 
