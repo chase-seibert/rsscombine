@@ -1,8 +1,8 @@
-name: Go
+name: engineering-manager-blogs
 
 on:
   schedule:
-    - cron: '23 * * * *' # once an hour at minute 23
+    - cron: '23 */4 * * *'
 
 jobs:
 
