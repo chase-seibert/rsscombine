@@ -1,0 +1,43 @@
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ] 
+  schedule:
+    - cron: '22 * * * *' # once an hour at minute 22
+
+jobs:
+
+  build:
+  
+    runs-on: ubuntu-latest
+    environment: new-york-times-rss-top-100
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Run
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: us-west-2
+        RSSCOMBINE_TITLE: "New York Times Top 100 Articles a Week"        
+        RSSCOMBINE_DESCRIPTION: "Combines public New York Times RSS feeds into one feed, with the goal of surfacing only the top items"        
+        RSSCOMBINE_AUTHOR_EMAIL: "chase.seibert@gmail.com"        
+        RSSCOMBINE_AUTHOR_NAME: "Chase Seibert"
+        RSSCOMBINE_FEED_LIMIT_PER_FEED: 5
+        RSSCOMBINE_FEED_URLS: "https://raw.githubusercontent.com/chase-seibert/new-york-times-rss-top-100/master/README.md"
+        RSSCOMBINE_LINK: "https://github.com/chase-seibert/new-york-times-rss-top-100"
+        RSSCOMBINE_S3_FILENAME: "new-york-times-rss-top-100.xml"
+
+      run: go run rsscombine.go
