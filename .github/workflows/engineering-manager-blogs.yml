@@ -50,3 +50,5 @@ jobs:
         RSSCOMBINE_S3_FILENAME: "engineering-manager-blogs.xml"
 
       run: go run rsscombine.go
+      
+    - uses: gautamkrishnar/keepalive-workflow@v1      
