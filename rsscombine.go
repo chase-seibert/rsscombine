@@ -131,7 +131,10 @@ func combineallFeeds(allFeeds []*gofeed.Feed) *feeds.Feed {
 	limit_per_feed := viper.GetInt("feed_limit_per_feed")
 	seen := make(map[string]bool)
 	for _, sourceFeed := range allFeeds {
-		for _, item := range sourceFeed.Items[:limit_per_feed] {
+		for i, item := range sourceFeed.Items {
+			if i > limit_per_feed {
+				break
+			}
 			if seen[item.Link] {
 				continue
 			}
