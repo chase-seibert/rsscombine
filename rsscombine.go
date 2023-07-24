@@ -184,6 +184,12 @@ func main() {
 	combinedFeed := GetAtomFeed()
 	atom, _ := combinedFeed.ToAtom()
 	log.Printf("Rendered RSS with %v items", len(combinedFeed.Items))
+	// if no S3 bucket is defined, simply print the feed on standard output
+	if len(bucket) == 0 {
+		fmt.Print(atom)
+		return
+	}
+	// Upload the feed to S3
 	sess, err := session.NewSession(&aws.Config{})
 	uploader := s3manager.NewUploader(sess)
 	_, err = uploader.Upload(&s3manager.UploadInput{
