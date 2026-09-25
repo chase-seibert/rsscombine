@@ -14,6 +14,31 @@ go mod download
 go run rsscombine.go
 ```
 
+### Docker
+
+Build the image with:
+
+```bash
+docker build -t rsscombine:local .
+```
+
+The container reads `rsscombine.yml` from `/app` and prints the generated Atom
+feed to standard output when no S3 bucket is configured. Create or mount a
+configuration file without `s3_bucket` and `s3_filename` at that path when
+running it:
+
+```bash
+docker run --rm \
+  -v "$PWD/rsscombine.yml:/app/rsscombine.yml:ro" \
+  rsscombine:local
+```
+
+The checked-in sample configuration includes S3 settings, so it will attempt an
+upload and requires AWS credentials.
+
+The application is a batch feed generator; it does not listen on the configured
+`port`.
+
 ## Configuration
 
 You can specify configuration options as either a YAML file, or as environment
