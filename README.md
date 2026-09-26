@@ -33,6 +33,17 @@ docker run --rm \
   rsscombine:local
 ```
 
+The Makefile also provides Docker targets that load the shared AWS environment
+and a profile-specific environment file:
+
+```bash
+make docker-build
+make docker-run file=engineering-manager-blogs.env
+make docker-run file=new-york-times.env
+```
+
+For another profile, use `make docker-run file=profile.env`.
+
 The checked-in sample configuration includes S3 settings, so it will attempt an
 upload and requires AWS credentials.
 
